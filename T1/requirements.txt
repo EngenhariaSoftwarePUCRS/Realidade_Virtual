@@ -1,0 +1,15 @@
+# YOLO (for hand tracking)
+ultralytics==8.0.107
+
+# OpenCV (for video capture from phone or webcam)
+opencv-python==4.8.0.74
+
+# WebSockets (for communication between phone and computer)
+websockets==11.0.3
+
+# OpenGL (for rendering the 3D objects)
+PyOpenGL==3.1.7
+PyOpenGL-accelerate==3.1.7
+
+# Numpy (for matrix operations in OpenGL)
+numpy==1.23.5
