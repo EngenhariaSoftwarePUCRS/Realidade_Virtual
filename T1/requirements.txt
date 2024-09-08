@@ -1,5 +1,5 @@
-# YOLO (for hand tracking)
-ultralytics==8.0.107
+# MediaPipe (for hand tracking)
+mediapipe==0.10.15
 
 # OpenCV (for video capture from phone or webcam)
 opencv-python==4.8.0.74
