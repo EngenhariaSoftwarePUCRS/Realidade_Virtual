@@ -1,11 +1,12 @@
 import cv2
 import mediapipe as mp
-import time
-from typing import Optional
+from typing import Optional, Tuple
 
 # Initialize MediaPipe Hand detection
 mp_hands: mp.solutions.hands = mp.solutions.hands
 mp_drawing: mp.solutions.drawing_utils = mp.solutions.drawing_utils
+
+wrist_location: Tuple[float, float, float] = (0.0, 0.0, 0.0)
 
 # Set up webcam
 cap: cv2.VideoCapture = cv2.VideoCapture(0)
@@ -47,6 +48,8 @@ with mp_hands.Hands(
                 # Get coordinates of key points on the hand (e.g., wrist, index finger)
                 wrist = hand_landmarks.landmark[mp_hands.HandLandmark.WRIST]
                 index_finger = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+
+                wrist_location = (wrist.x, wrist.y, wrist.z)
 
                 # Print wrist and index finger coordinates
                 print(f"Wrist: ({wrist.x:.2f}, {wrist.y:.2f}, {wrist.z:.2f}), Index Finger: ({index_finger.x:.2f}, {index_finger.y:.2f}, {index_finger.z:.2f})")
