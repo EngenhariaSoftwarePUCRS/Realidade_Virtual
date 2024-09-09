@@ -1,18 +1,16 @@
 import pygame
 
-from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-
-
-display = (800, 600)
+from pygame.locals import *
+from typing import Tuple
 
 # Initial cube and sphere positions
 cube_pos = [-2, 0, 0]
 sphere_pos = [2, 0, 0]
 
 
-def init():
+def init(display: Tuple[int, int] = (800, 600)) -> None:
     pygame.init()
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
     glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -23,7 +21,7 @@ def init():
     glTranslatef(0.0, 0.0, -5)
 
 
-def draw_cube(center_pos, color):
+def _draw_cube(center_pos, color = (1, 1, 1)):
     glPushMatrix()
     glTranslatef(*center_pos)
     glColor3fv(color)
@@ -62,7 +60,7 @@ def draw_cube(center_pos, color):
     glPopMatrix()
 
 
-def draw_sphere(center_pos, color):
+def _draw_sphere(center_pos, color = (1, 1, 1)):
     glPushMatrix()
     glTranslatef(*center_pos)
     glColor3fv(color)
@@ -116,8 +114,8 @@ def main():
                 move_sphere(sphere_pos)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        draw_cube(cube_pos, (1, 0, 0))
-        draw_sphere(sphere_pos, (0, 0, 1))
+        _draw_cube(cube_pos, (1, 0, 0))
+        _draw_sphere(sphere_pos, (0, 0, 1))
 
         glRotatef(1, 3, 1, 1)
         
