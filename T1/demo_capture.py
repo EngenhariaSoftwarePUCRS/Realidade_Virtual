@@ -9,9 +9,9 @@ def open_camera() -> None:
         print("Error: Unable to open the camera.")
         return
 
+    ret: bool
+    frame: Optional[cv2.Mat]
     while True:
-        ret: bool
-        frame: Optional[cv2.Mat]
         ret, frame = cap.read()  # Correctly capturing both ret and frame
 
         if not ret:
