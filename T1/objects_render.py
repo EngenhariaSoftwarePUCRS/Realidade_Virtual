@@ -60,12 +60,16 @@ def _draw_cube(center_pos, color = (1, 1, 1)):
     glPopMatrix()
 
 
-def _draw_sphere(center_pos, color = (1, 1, 1)):
+def draw_sphere(
+    center_pos,
+    size = 1,
+    color = (1, 1, 1),
+):
     glPushMatrix()
     glTranslatef(*center_pos)
     glColor3fv(color)
     quad = gluNewQuadric()
-    gluSphere(quad, 1, 32, 32)
+    gluSphere(quad, size, 32, 32)
     glPopMatrix()
 
 
@@ -115,7 +119,7 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         _draw_cube(cube_pos, (1, 0, 0))
-        _draw_sphere(sphere_pos, (0, 0, 1))
+        draw_sphere(sphere_pos, 1, (0, 0, 1))
 
         glRotatef(1, 3, 1, 1)
         
