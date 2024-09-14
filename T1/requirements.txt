@@ -11,8 +11,12 @@ websockets==11.0.3
 PyOpenGL==3.1.7
 PyOpenGL-accelerate==3.1.7
 
-# Numpy (for matrix operations in OpenGL)
-numpy==1.23.5
+# # Numpy (for matrix operations in OpenGL)
+# Install with Conda
+# numpy==1.23.5
 
 # Pygame (for window management with OpenGL)
 pygame==2.6.0
+
+# Cython (for compiling C extensions and accelerating code)
+Cython==3.0.0

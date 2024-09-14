@@ -40,7 +40,7 @@ mp_hands = mp.solutions.hands.Hands(
 mp_drawing = mp.solutions.drawing_utils
 
 
-def get_wrists_location(frame: cv2.Mat) -> Optional[HandLandmarks]:
+def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
     # Convert the image to RGB (MediaPipe requires RGB input)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
             break
 
         frame = cv2.flip(frame, 1)  # Mirror the frame
-        hand_landmarks = get_wrists_location(frame)
+        hand_landmarks = get_hand_landmarks(frame)
 
         if hand_landmarks is not None:
             print(f"\nHand detected")

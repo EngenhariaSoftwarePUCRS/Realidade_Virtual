@@ -1,7 +1,7 @@
 import cv2
 from typing import Optional
 
-from hand_capture import Wrists, get_wrists_location
+from hand_capture import HandLandmarks, get_hand_landmarks, is_grabbing
 from objects_render import init as init_render
 
 # Set up display window size
@@ -9,6 +9,9 @@ display = (640, 360)
 
 # Set up webcam
 cap = cv2.VideoCapture(0)
+
+# Initialize global variables
+hand_landmarks: HandLandmarks = None
 
 
 def main():
@@ -31,14 +34,17 @@ def main():
         frame = cv2.flip(frame, 1)
         frame = cv2.resize(frame, display)
 
-        wrists_locations: Wrists = get_wrists_location(frame)
-        if any(wrist is not None for wrist in wrists_locations):
-            wrists_count = len([wrist for wrist in wrists_locations if wrist is not None])
-            print(f"\nHands detected: {wrists_count}")
+        hand_landmarks = get_hand_landmarks(frame)
+        if hand_landmarks is not None:
+            print(f"\nHand detected")
+            wrist_location = hand_landmarks.wrist
+            print(f"Wrist found at: {wrist_location.x:.2f}, {wrist_location.y:.2f}, {wrist_location.z:.2f}")
+            print(f"Thumb tip found at: {hand_landmarks.thumb_tip.x:.2f}, {hand_landmarks.thumb_tip.y:.2f}, {hand_landmarks.thumb_tip.z:.2f}")
+            print(f"Index finger tip found at: {hand_landmarks.index_tip.x:.2f}, {hand_landmarks.index_tip.y:.2f}, {hand_landmarks.index_tip.z:.2f}")
 
-            for i, wrist_location in enumerate(wrists_locations):
-                if wrist_location is not None:
-                    print(f"Wrist {i + 1} found at: {wrist_location.x:.2f}, {wrist_location.y:.2f}, {wrist_location.z:.2f}")
+            is_grabbing_something = is_grabbing(hand_landmarks)
+            print(f"Is grabbing: {is_grabbing_something}")
+        
 
         cv2.imshow("Hands Seeker", frame)
         
