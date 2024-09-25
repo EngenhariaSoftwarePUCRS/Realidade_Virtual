@@ -1,19 +1,13 @@
 import cv2
 import mediapipe as mp
-from typing import Optional, Tuple
+from typing import Optional
+
+from points import Point3D
 
 
 MAX_HAND_COUNT = 1
 
-class HandLandmark:
-    x: float
-    y: float
-    z: float
-
-    def __init__(self, x: float, y: float, z: float):
-        self.x = x
-        self.y = y
-        self.z = z
+HandLandmark = Point3D
 
 
 class HandLandmarks:

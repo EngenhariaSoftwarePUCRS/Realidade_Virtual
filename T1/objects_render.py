@@ -16,7 +16,8 @@ def init(display: Tuple[int, int] = (800, 600)) -> None:
     glClearColor(0.0, 0.0, 0.0, 1.0)
     glEnable(GL_DEPTH_TEST)
     glMatrixMode(GL_PROJECTION)
-    gluPerspective(45, display[0] / display[1], 0.1, 50.0)
+    glLoadIdentity()
+    gluPerspective(45, display[0] / display[1], 0.1, 100.0) 
     glMatrixMode(GL_MODELVIEW)
     glTranslatef(0.0, 0.0, -5)
 
@@ -61,9 +62,9 @@ def _draw_cube(center_pos, color = (1, 1, 1)):
 
 
 def draw_sphere(
-    center_pos,
-    size = 1,
-    color = (1, 1, 1),
+    center_pos: Tuple[float, float, float],
+    size: int = 1,
+    color: Tuple[float, float, float] = (1, 1, 1),
 ):
     glPushMatrix()
     glTranslatef(*center_pos)
