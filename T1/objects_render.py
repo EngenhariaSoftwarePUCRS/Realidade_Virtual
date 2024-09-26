@@ -71,6 +71,17 @@ def draw_cube(
     glPopMatrix()
 
 
+def is_point_in_cube(
+    point: Point3D,
+    cube_position: Point3D,
+    cube_size: float,
+    tolerance: float = 0.01,
+) -> bool:
+    half_size = cube_size / 2.0
+    return (cube_position.x - half_size - tolerance <= point.x <= cube_position.x + half_size + tolerance
+            and cube_position.y - half_size - tolerance <= point.y <= cube_position.y + half_size + tolerance)
+
+
 def draw_sphere(
     center_pos: Point3D,
     size: int = 1,

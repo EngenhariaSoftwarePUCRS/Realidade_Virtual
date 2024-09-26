@@ -1,4 +1,5 @@
 import cv2
+from random import randint
 from typing import Optional
 
 from hand_capture import HandLandmarks, get_hand_landmarks, is_grabbing
@@ -10,6 +11,7 @@ from objects_render import (
     glClear,
     GL_COLOR_BUFFER_BIT,
     GL_DEPTH_BUFFER_BIT,
+    is_point_in_cube,
     pygame,
 )
 from points import Point3D
@@ -68,15 +70,27 @@ def main():
         hand_landmarks = get_hand_landmarks(frame)
         if hand_landmarks is not None:
             # print_hand_landmarks(hand_landmarks)
-
             sphere_position = display_to_3d.convert(hand_landmarks.wrist)
             # print(sphere_position)
-
             is_grabbing_motion = is_grabbing(hand_landmarks)
             #print(f"Is grabbing: {is_grabbing_motion}")
             sphere_color = (1, 0, 0) if is_grabbing_motion else (1, 1, 1)
-
             draw_sphere(sphere_position, sphere_size, sphere_color)
+
+            tab_count = randint(1, 10)
+            if is_point_in_cube(sphere_position, left_cube_position, cube_size):
+                print("\033[1;33;40m" + "\t" * tab_count, end="")
+                print("Left cube collision!")
+                if is_grabbing_motion:
+                    print("Left cube grabbed!")
+                print("\033[0m")
+
+            if is_point_in_cube(sphere_position, right_cube_position, cube_size):
+                print("\033[1;36;40m" + "\t" * tab_count, end="")
+                print("Right cube collision!")
+                if is_grabbing_motion:
+                    print("Right cube grabbed!")
+                print("\033[0m")
 
         pygame.display.flip()
 
