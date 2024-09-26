@@ -15,7 +15,7 @@ from objects_render import (
     pygame,
 )
 from points import Point3D
-from prints import print_hand_landmarks
+from prints import print_hand_landmarks, print_tabs
 
 # Set up display window size
 display = (640, 360)
@@ -77,19 +77,24 @@ def main():
             sphere_color = (1, 0, 0) if is_grabbing_motion else (1, 1, 1)
             draw_sphere(sphere_position, sphere_size, sphere_color)
 
-            tab_count = randint(1, 10)
             if is_point_in_cube(sphere_position, left_cube_position, cube_size):
-                print("\033[1;33;40m" + "\t" * tab_count, end="")
+                print("\033[1;33;40m")
+                print_tabs(2)
                 print("Left cube collision!")
                 if is_grabbing_motion:
                     print("Left cube grabbed!")
+                    move_to_position = display_to_3d.convert(hand_landmarks.index_tip)
+                    left_cube_position = move_to_position
                 print("\033[0m")
 
             if is_point_in_cube(sphere_position, right_cube_position, cube_size):
-                print("\033[1;36;40m" + "\t" * tab_count, end="")
+                print("\033[1;36;40m")
+                print_tabs(6)
                 print("Right cube collision!")
                 if is_grabbing_motion:
                     print("Right cube grabbed!")
+                    move_to_position = display_to_3d.convert(hand_landmarks.index_tip)
+                    right_cube_position = move_to_position
                 print("\033[0m")
 
         pygame.display.flip()
