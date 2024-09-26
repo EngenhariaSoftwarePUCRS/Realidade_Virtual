@@ -2,7 +2,7 @@ import cv2
 from random import randint
 from typing import Optional
 
-from hand_capture import HandLandmarks, get_hand_landmarks, is_grabbing
+from hand_capture import HandLandmarks, get_hand_landmarks, is_hand_closed, is_grabbing
 from display_mapper import DisplayTo3D
 from objects_render import (
     draw_cube,
@@ -25,11 +25,11 @@ cap = cv2.VideoCapture(0)
 
 # Initialize global variables
 hand_landmarks: HandLandmarks = None
-sphere_size = 1 / 1_000
+sphere_size = 2 / 1_000
 sphere_position = Point3D(0, 0, 0)
 cube_size = 4 / 100
-left_cube_position = Point3D(0.25, 0.5, 0.5)
-right_cube_position = Point3D(0.75, 0.5, 0.5)
+left_cube_position = Point3D(0.25, 0.5, 0.6)
+right_cube_position = Point3D(0.75, 0.5, 0.4)
 
 
 def main():
@@ -70,31 +70,50 @@ def main():
         hand_landmarks = get_hand_landmarks(frame)
         if hand_landmarks is not None:
             # print_hand_landmarks(hand_landmarks)
+            print("\nWrist: " + str(hand_landmarks.wrist))
             sphere_position = display_to_3d.convert(hand_landmarks.wrist)
-            # print(sphere_position)
-            is_grabbing_motion = is_grabbing(hand_landmarks)
-            #print(f"Is grabbing: {is_grabbing_motion}")
-            sphere_color = (1, 0, 0) if is_grabbing_motion else (1, 1, 1)
+            # print("Sphere: " + str(sphere_position))
+
+            is_hand_closed_gesture = is_hand_closed(hand_landmarks)
+            #print(f"Is hand closed gesture: {is_hand_closed_gesture}")
+
+            is_grabbing_gesture = is_grabbing(hand_landmarks)
+            #print(f"Is grabbing: {is_grabbing_gesture}")
+
+            if is_hand_closed_gesture:
+                sphere_color = (1, 0, 0)
+            elif is_grabbing_gesture:
+                sphere_color = (0, 1, 0)
+            else:
+                sphere_color = (1, 1, 1)
             draw_sphere(sphere_position, sphere_size, sphere_color)
 
             if is_point_in_cube(sphere_position, left_cube_position, cube_size):
                 print("\033[1;33;40m")
                 print_tabs(2)
                 print("Left cube collision!")
-                if is_grabbing_motion:
+                if is_hand_closed_gesture:
+                    print_tabs(2)
                     print("Left cube grabbed!")
-                    move_to_position = display_to_3d.convert(hand_landmarks.index_tip)
+                    move_to_position = sphere_position
                     left_cube_position = move_to_position
+                elif is_grabbing_gesture:
+                    print_tabs(2)
+                    print("Left cube picked!")
                 print("\033[0m")
 
             if is_point_in_cube(sphere_position, right_cube_position, cube_size):
                 print("\033[1;36;40m")
-                print_tabs(6)
+                print_tabs(8)
                 print("Right cube collision!")
-                if is_grabbing_motion:
+                if is_hand_closed_gesture:
+                    print_tabs(8)
                     print("Right cube grabbed!")
-                    move_to_position = display_to_3d.convert(hand_landmarks.index_tip)
+                    move_to_position = sphere_position
                     right_cube_position = move_to_position
+                elif is_grabbing_gesture:
+                    print_tabs(8)
+                    print("Right cube picked!")
                 print("\033[0m")
 
         pygame.display.flip()
@@ -109,6 +128,8 @@ def main():
 if __name__ == "__main__":
     try:
         main()
+    except KeyboardInterrupt:
+        print("\nExiting...")
     finally:
         cap.release()
         cv2.destroyAllWindows()
