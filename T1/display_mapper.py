@@ -46,4 +46,5 @@ class DisplayTo3D:
         win_z = depth
         
         world_coords = gluUnProject(win_x, win_y, win_z, model_view, projection, viewport)
-        return world_coords
+
+        return Point3D(*world_coords)
