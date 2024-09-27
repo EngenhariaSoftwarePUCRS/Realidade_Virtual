@@ -1,7 +1,7 @@
 import cv2
 from typing import Optional
 
-from hand_capture import HandLandmarks, get_hand_landmarks, is_hand_closed, is_grabbing
+from hand_capture import HandLandmarks, get_hand_landmarks, get_hand_orientation, is_hand_closed, is_grabbing
 from display_mapper import DisplayTo3D
 from objects_render import (
     draw_cube,
@@ -29,12 +29,16 @@ sphere_position = Point3D(0, 0, 0)
 cube_size = 4 / 100
 left_cube_position = Point3D(0.25, 0.5, 0.6)
 left_cube_angle = 0
+left_cube_rotation_axis = (0, 0, 0)
 right_cube_position = Point3D(0.75, 0.5, 0.4)
 right_cube_angle = 0
+right_cube_rotation_axis = (0, 0, 0)
 
 
 def main():
-    global cap, display, hand_landmarks, sphere_position, left_cube_position, left_cube_angle, right_cube_position, right_cube_angle
+    global cap, display, hand_landmarks, sphere_position, cube_size, \
+        left_cube_position, left_cube_angle, left_cube_rotation_axis, \
+        right_cube_position, right_cube_angle, right_cube_rotation_axis
 
     if not cap.isOpened():
         print("Error: Unable to open the camera.")
@@ -65,8 +69,8 @@ def main():
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        draw_cube(left_cube_position, cube_size, left_cube_angle, (1, 1, 0))
-        draw_cube(right_cube_position, cube_size, right_cube_angle, (0, 1, 1))
+        draw_cube(left_cube_position, cube_size, left_cube_angle, left_cube_rotation_axis, (1, 1, 0))
+        draw_cube(right_cube_position, cube_size, right_cube_angle, right_cube_rotation_axis, (0, 1, 1))
 
         hand_landmarks = get_hand_landmarks(frame)
         if hand_landmarks is not None:
@@ -74,6 +78,9 @@ def main():
             # print("\nWrist: " + str(hand_landmarks.wrist))
             sphere_position = display_to_3d.convert(hand_landmarks.wrist)
             # print("Sphere: " + str(sphere_position))
+
+            # hand_orientation = get_hand_orientation(hand_landmarks)
+            # print("Hand orientation: " + str(hand_orientation))
 
             is_hand_closed_gesture = is_hand_closed(hand_landmarks)
             #print(f"Is hand closed gesture: {is_hand_closed_gesture}")
@@ -90,8 +97,8 @@ def main():
             draw_sphere(sphere_position, sphere_size, sphere_color)
 
             if is_point_in_cube(sphere_position, left_cube_position, cube_size):
-                print("\033[1;33;40m")
-                print_tabs(2)
+                print("\033[0;33m", end="")
+                # print_tabs(2)
                 # print("Left cube collision!")
                 if is_hand_closed_gesture:
                     print_tabs(2)
@@ -111,15 +118,16 @@ def main():
                         index_tip.z - thumb_tip.z,
                     )
 
-                    rotation_angle = calculate_rotation_angle(vector)
-                    print(rotation_angle)
-                    left_cube_angle = rotation_angle
+                    left_cube_angle = calculate_rotation_angle(vector)
+                    left_cube_rotation_axis = get_hand_orientation(hand_landmarks)
+                    print_tabs(2)
+                    print("Rotation axis: " + str(left_cube_rotation_axis))
                     
                 print("\033[0m")
 
             if is_point_in_cube(sphere_position, right_cube_position, cube_size):
-                print("\033[1;36;40m")
-                print_tabs(8)
+                print("\033[0;36m", end="")
+                # print_tabs(8)
                 # print("Right cube collision!")
                 if is_hand_closed_gesture:
                     print_tabs(8)
@@ -139,9 +147,10 @@ def main():
                         index_tip.z - thumb_tip.z,
                     )
 
-                    rotation_angle = calculate_rotation_angle(vector)
-                    print(rotation_angle)
-                    right_cube_angle = rotation_angle
+                    right_cube_angle = calculate_rotation_angle(vector)
+                    right_cube_rotation_axis = get_hand_orientation(hand_landmarks)
+                    print_tabs(8)
+                    print("Rotation axis: " + str(right_cube_rotation_axis))
                 
                 print("\033[0m")
 

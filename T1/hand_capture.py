@@ -1,9 +1,9 @@
 import cv2
 import mediapipe as mp
-from typing import Optional
+from typing import Optional, Tuple
 
 from display_mapper import DisplayTo3D
-from points import Point3D, calculate_distance
+from points import calculate_distance, Point3D
 
 
 MAX_HAND_COUNT = 1
@@ -140,10 +140,28 @@ def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
     return hand_landmarks
 
 
+def get_hand_orientation(hand_landmarks: HandLandmarks) -> Tuple[float, float, float]:
+    """Determines the orientation of the hand based on the location of the tip of the middle finger in relation to the wrist."""
+    if hand_landmarks is None:
+        return 0, 0, 0
+
+    wrist = hand_landmarks.wrist
+    middle_tip = hand_landmarks.middle_tip
+
+    if wrist is None or middle_tip is None:
+        return 0, 0, 0
+
+    x = middle_tip.x - wrist.x
+    y = middle_tip.y - wrist.y
+    z = middle_tip.z - wrist.z
+
+    return x, y, z
+
+
 def is_hand_closed(
     hand_landmarks: HandLandmarks,
-    wrist_treeshold: float = 0.16,
-    mcp_treeshold: float = 0.08,
+    wrist_treeshold: float = 0.18,
+    mcp_treeshold: float = 0.12,
 ) -> bool:
     """Determines if the hand is closed based on the distance between the wrist and the fingertips."""
 
@@ -182,12 +200,12 @@ def is_hand_closed(
     avg_finger_mcp_dist = (thumb_mcp_dist + index_mcp_dist + middle_mcp_dist + ring_mcp_dist + pinky_mcp_dist) / 5
 
     # print(
-    #     f"Thumb-mcp distance: {thumb_mcp_dist:.2f}, "
-    #     f"Index-mcp distance: {index_mcp_dist:.2f}, "
-    #     f"Middle-mcp distance: {middle_mcp_dist:.2f}, "
-    #     f"Ring-mcp distance: {ring_mcp_dist:.2f}, "
-    #     f"Pinky-mcp distance: {pinky_mcp_dist:.2f}, "
-    #     f"Avg. finger-mcp distance: {avg_finger_mcp_dist:.2f}"
+        # f"Thumb-mcp distance: {thumb_mcp_dist:.2f}, "
+        # f"Index-mcp distance: {index_mcp_dist:.2f}, "
+        # f"Middle-mcp distance: {middle_mcp_dist:.2f}, "
+        # f"Ring-mcp distance: {ring_mcp_dist:.2f}, "
+        # f"Pinky-mcp distance: {pinky_mcp_dist:.2f}, "
+        # f"Avg. finger-mcp distance: {avg_finger_mcp_dist:.2f}"
     # )
 
     return avg_finger_wrist_dist < wrist_treeshold or avg_finger_mcp_dist < mcp_treeshold

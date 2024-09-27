@@ -28,6 +28,7 @@ def draw_cube(
     center_pos: Point3D,
     size: float = 1.0,
     angle: float = 0.0,
+    rotation_axis: Tuple[float, float, float] = (0, 0, 0),
     color: Tuple[float, float, float] = (1, 1, 1),
 ):
     """Draws a cube at the specified center position with a given size and color."""
@@ -36,7 +37,7 @@ def draw_cube(
 
     glPushMatrix()
     glTranslatef(*center_pos)
-    glRotatef(angle, 1.0, 0.0, 0.0)    
+    glRotatef(angle, *rotation_axis)
     glColor3fv(color)
     glBegin(GL_QUADS)
     # Front face
@@ -110,8 +111,8 @@ def main():
                 return
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        draw_cube(cube_pos, 1, 0, (1, 0, 0))
-        draw_sphere(sphere_pos, 1, (0, 0, 1))
+        draw_cube(cube_pos, color=(1, 0, 0))
+        draw_sphere(sphere_pos, color=(0, 0, 1))
 
         glRotatef(1, 3, 1, 1)
         
