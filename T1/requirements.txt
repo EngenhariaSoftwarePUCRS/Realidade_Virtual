@@ -9,7 +9,7 @@ websockets==11.0.3
 
 # OpenGL (for rendering the 3D objects)
 PyOpenGL==3.1.7
-PyOpenGL-accelerate==3.1.7
+# PyOpenGL-accelerate==3.1.7
 
 # # Numpy (for matrix operations in OpenGL)
 # Install with Conda

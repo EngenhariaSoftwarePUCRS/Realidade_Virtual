@@ -120,10 +120,8 @@ def main():
 
                     left_cube_angle = calculate_rotation_angle(vector)
                     left_cube_rotation_axis = get_hand_orientation(hand_landmarks)
-                    print_tabs(2)
-                    print("Rotation axis: " + str(left_cube_rotation_axis))
-                    
-                print("\033[0m")
+                    # print_tabs(2)
+                    # print("Rotation axis: " + str(left_cube_rotation_axis))
 
             if is_point_in_cube(sphere_position, right_cube_position, cube_size):
                 print("\033[0;36m", end="")
@@ -149,10 +147,10 @@ def main():
 
                     right_cube_angle = calculate_rotation_angle(vector)
                     right_cube_rotation_axis = get_hand_orientation(hand_landmarks)
-                    print_tabs(8)
-                    print("Rotation axis: " + str(right_cube_rotation_axis))
+                    # print_tabs(8)
+                    # print("Rotation axis: " + str(right_cube_rotation_axis))
                 
-                print("\033[0m")
+            print("\033[0m", end="")
 
         pygame.display.flip()
 

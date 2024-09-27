@@ -23,12 +23,7 @@ O usuário pode:
 ## Requisitos
 
 1. **Conda**: Certifique-se de que o **conda** está instalado.
-2. Crie e ative um ambiente usando o arquivo `requirements.txt` com os pacotes necessários:
-```bash
-conda create --name virtual_env --file requirements.txt
-conda activate virtual_env
-```
-3. Verifique se a câmera está funcionando corretamente.
+2. Verifique se a câmera está funcionando corretamente e está acessível.
 
 ## Como Executar
 
@@ -42,8 +37,10 @@ cd Realidade_Virtual/T1
 ```
 3. Instale as dependências usando o Conda como mencionado.
 ```bash
-conda create --name virtual_env --file requirements.txt
+conda create -n virtual_env python=3.10.14
 conda activate virtual_env
+conda install numpy==1.23.5
+pip install -r requirements.txt
 ```
 4. Execute o script `main.py`.
 ```bash
@@ -55,8 +52,16 @@ python main.py
 ## Gestos de Controle
 
 - **Pegar o Cubo**: Feche a mão próximo ao cubo para pegá-lo.
+  - Ao fechar a mão, o "cursor" da mão ficará vermelho, indicando que foi identificada a interação.
+  - Ainda, aparecerá uma mensagem no terminal indicando que o cubo foi "agarrado".
 - **Mover o Cubo**: Mova a mão fechada para transladar o cubo.
+  - O cubo se moverá em relação ao pulso.
 - **Rotacionar o Cubo**: Faça o gesto de "pinça" (polegar e indicador juntos) para rotacionar o cubo.
+  - Ao fazer o gesto, o "cursor" da mão ficará verde, indicando que foi identificada a interação.
+  - Aqui também aparecerá uma mensagem no terminal indicando que o cubo foi "pego".
+  - Ainda, o cubo rotacionará em relação a direção do dedo médio e o centro da palma da mão.
+    - Ou seja, a rotação será feita em torno do eixo que passa pelo dedo médio e o centro da palma.
+    - PS: Existem algumas limitações na rotação, devido a dificuldade de identificar a direção do dedo médio.
 
 ## Encerramento
 
@@ -65,6 +70,11 @@ python main.py
 
 ## Notas
 
-- Este projeto utiliza **OpenGL** com **Pygame** para renderização e **MediaPipe** para rastreamento de mãos.
-- Certifique-se de que a câmera está funcionando corretamente e acessível pelo OpenCV.
-
+- O cenário é renderizado em 3D, e os objetos são manipulados em tempo real.
+- O código foi testado em ambiente Windows 10 com Python 3.10.14.
+- O observador do cenário é fixo, e a variação de perspectiva é feita pela movimentação dos objetos.
+  - Ou seja, a câmera não se move, apenas os objetos são transladados e rotacionados.
+  - Quanto mais próximo a mão estiver da câmera, maior será o objeto na tela.
+  - Ao se afastar da câmera, eventualmente o programa sempre identificará a mão como fechada.
+- Houveram dificuldades na captação de profundidade, na própria biblioteca MediaPipe.
+  - Por isso, os objetos e o cursor parecem se mover pouco neste eixo (para "dentro" e "fora" da tela).
