@@ -1,3 +1,4 @@
+import math
 from typing import Union
 
 
@@ -35,3 +36,14 @@ class Point3D(Point2D):
 
 
 Point = Union[Point2D, Point3D]
+
+
+def calculate_distance(point1: Point3D, point2: Point3D) -> float:
+    """Calculates the Euclidean distance between two 3D points."""
+    return math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2 + (point2.z - point1.z) ** 2)
+
+
+def calculate_rotation_angle(vector: Point3D) -> float:
+    magnitude = math.sqrt(vector.x ** 2 + vector.y ** 2 + vector.z ** 2)
+    scaler = 200
+    return magnitude * scaler

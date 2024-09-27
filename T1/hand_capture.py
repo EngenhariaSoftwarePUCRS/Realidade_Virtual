@@ -1,10 +1,9 @@
 import cv2
-import math
 import mediapipe as mp
 from typing import Optional
 
 from display_mapper import DisplayTo3D
-from points import Point3D
+from points import Point3D, calculate_distance
 
 
 MAX_HAND_COUNT = 1
@@ -141,15 +140,10 @@ def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
     return hand_landmarks
 
 
-def calculate_distance(point1, point2):
-    """Calculates the Euclidean distance between two 3D points."""
-    return math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2 + (point2.z - point1.z) ** 2)
-
-
 def is_hand_closed(
     hand_landmarks: HandLandmarks,
     wrist_treeshold: float = 0.16,
-    mcp_treeshold: float = 0.12,
+    mcp_treeshold: float = 0.08,
 ) -> bool:
     """Determines if the hand is closed based on the distance between the wrist and the fingertips."""
 
