@@ -14,7 +14,7 @@ from objects_render import (
     pygame,
 )
 from points import Point3D, calculate_rotation_angle
-from prints import print_hand_landmarks, print_tabs
+from prints import print_tabs #, print_hand_landmarks
 
 # Set up display window size
 display = (640, 360)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nExiting...")
     finally:
-        print("Releasing camera and closing windows...")
+        print("\nReleasing camera and closing windows...")
         print("Thank you for using!")
         cap.release()
         cv2.destroyAllWindows()
