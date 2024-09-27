@@ -15,9 +15,13 @@ HandLandmark = Point3D
 class HandLandmarks:
     wrist: Optional[HandLandmark]
     thumb_tip: Optional[HandLandmark]
+    thumb_mcp: Optional[HandLandmark]
     index_tip: Optional[HandLandmark]
+    index_mcp: Optional[HandLandmark]
     middle_tip: Optional[HandLandmark]
+    middle_mcp: Optional[HandLandmark]
     ring_tip: Optional[HandLandmark]
+    ring_mcp: Optional[HandLandmark]
     pinky_tip: Optional[HandLandmark]
     pinky_dip: Optional[HandLandmark]
     pinky_pip: Optional[HandLandmark]
@@ -26,9 +30,13 @@ class HandLandmarks:
     def __init__(self,
                  wrist: Optional[HandLandmark],
                  index_tip: Optional[HandLandmark],
+                 index_mcp: Optional[HandLandmark],
                  thumb_tip: Optional[HandLandmark] = None,
+                 thumb_mcp: Optional[HandLandmark] = None,
                  middle_tip: Optional[HandLandmark] = None,
+                 middle_mcp: Optional[HandLandmark] = None,
                  ring_tip: Optional[HandLandmark] = None,
+                 ring_mcp: Optional[HandLandmark] = None,
                  pinky_tip: Optional[HandLandmark] = None,
                  pinky_dip: Optional[HandLandmark] = None,
                  pinky_pip: Optional[HandLandmark] = None,
@@ -36,9 +44,13 @@ class HandLandmarks:
                  ):
         self.wrist = wrist
         self.thumb_tip = thumb_tip
+        self.thumb_mcp = thumb_mcp
         self.index_tip = index_tip
+        self.index_mcp = index_mcp
         self.middle_tip = middle_tip
+        self.middle_mcp = middle_mcp
         self.ring_tip = ring_tip
+        self.ring_mcp = ring_mcp
         self.pinky_tip = pinky_tip
         self.pinky_dip = pinky_dip
         self.pinky_pip = pinky_pip
@@ -54,8 +66,6 @@ mp_hands = mp.solutions.hands.Hands(
 mp_drawing = mp.solutions.drawing_utils
 
 
-smallest_z = 0
-largest_z = 1e-10
 def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
     # Convert the image to RGB (MediaPipe requires RGB input)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -74,11 +84,9 @@ def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
             mp_drawing.draw_landmarks(frame, multi_hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS)
 
             def z_fix(z: float) -> float:
-                global smallest_z, largest_z
-                fixed = DisplayTo3D.normalize_hand_depth(z, min_capture_found=smallest_z, max_capture_found=largest_z)
-                smallest_z = min(smallest_z, z)
-                largest_z = max(largest_z, z)
-                print(f"Smallest z: {smallest_z}, Largest z: {largest_z}")
+                z_scaler = 10_000_000
+                z_scaled = z * z_scaler
+                fixed = DisplayTo3D.normalize_hand_depth(z_scaled)
                 return fixed
 
             # Get coordinates of key points on the hand (e.g., wrist, index finger tip)
@@ -87,15 +95,23 @@ def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
 
             thumb_tip = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_TIP]
             thumb_tip_landmark = HandLandmark(thumb_tip.x, thumb_tip.y, z_fix(thumb_tip.z))
+            thumb_mcp = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_MCP]
+            thumb_mcp_landmark = HandLandmark(thumb_mcp.x, thumb_mcp.y, z_fix(thumb_mcp.z))
             
             index_tip = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP]
             index_tip_landmark = HandLandmark(index_tip.x, index_tip.y, z_fix(index_tip.z))
+            index_mcp = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_MCP]
+            index_mcp_landmark = HandLandmark(index_mcp.x, index_mcp.y, z_fix(index_mcp.z))
 
             middle_tip = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP]
             middle_tip_landmark = HandLandmark(middle_tip.x, middle_tip.y, z_fix(middle_tip.z))
+            middle_mcp = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.MIDDLE_FINGER_MCP]
+            middle_mcp_landmark = HandLandmark(middle_mcp.x, middle_mcp.y, z_fix(middle_mcp.z))
 
             ring_tip = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.RING_FINGER_TIP]
             ring_tip_landmark = HandLandmark(ring_tip.x, ring_tip.y, z_fix(ring_tip.z))
+            ring_mcp = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.RING_FINGER_MCP]
+            ring_mcp_landmark = HandLandmark(ring_mcp.x, ring_mcp.y, z_fix(ring_mcp.z))
 
             pinky_tip = multi_hand_landmarks.landmark[mp.solutions.hands.HandLandmark.PINKY_TIP]
             pinky_tip_landmark = HandLandmark(pinky_tip.x, pinky_tip.y, z_fix(pinky_tip.z))
@@ -109,9 +125,13 @@ def get_hand_landmarks(frame: cv2.Mat) -> Optional[HandLandmarks]:
             hand_landmarks = HandLandmarks(
                 wrist_landmark,
                 thumb_tip_landmark,
+                thumb_mcp_landmark,
                 index_tip_landmark,
+                index_mcp_landmark,
                 middle_tip_landmark,
+                middle_mcp_landmark,
                 ring_tip_landmark,
+                ring_mcp_landmark,
                 pinky_tip_landmark,
                 pinky_dip_landmark,
                 pinky_pip_landmark,
@@ -128,7 +148,8 @@ def calculate_distance(point1, point2):
 
 def is_hand_closed(
     hand_landmarks: HandLandmarks,
-    treeshold: float = 0.15,
+    wrist_treeshold: float = 0.16,
+    mcp_treeshold: float = 0.12,
 ) -> bool:
     """Determines if the hand is closed based on the distance between the wrist and the fingertips."""
 
@@ -157,7 +178,25 @@ def is_hand_closed(
     #     f"Avg. finger-wrist distance: {avg_finger_wrist_dist:.2f}"
     # )
 
-    return avg_finger_wrist_dist <= treeshold
+    # Calculate the distances between each tip and its corresponding mcp
+    thumb_mcp_dist = calculate_distance(hand_landmarks.thumb_tip, hand_landmarks.thumb_mcp)
+    index_mcp_dist = calculate_distance(hand_landmarks.index_tip, hand_landmarks.index_mcp)
+    middle_mcp_dist = calculate_distance(hand_landmarks.middle_tip, hand_landmarks.middle_mcp)
+    ring_mcp_dist = calculate_distance(hand_landmarks.ring_tip, hand_landmarks.ring_mcp)
+    pinky_mcp_dist = calculate_distance(hand_landmarks.pinky_tip, hand_landmarks.pinky_mcp)
+
+    avg_finger_mcp_dist = (thumb_mcp_dist + index_mcp_dist + middle_mcp_dist + ring_mcp_dist + pinky_mcp_dist) / 5
+
+    # print(
+    #     f"Thumb-mcp distance: {thumb_mcp_dist:.2f}, "
+    #     f"Index-mcp distance: {index_mcp_dist:.2f}, "
+    #     f"Middle-mcp distance: {middle_mcp_dist:.2f}, "
+    #     f"Ring-mcp distance: {ring_mcp_dist:.2f}, "
+    #     f"Pinky-mcp distance: {pinky_mcp_dist:.2f}, "
+    #     f"Avg. finger-mcp distance: {avg_finger_mcp_dist:.2f}"
+    # )
+
+    return avg_finger_wrist_dist < wrist_treeshold or avg_finger_mcp_dist < mcp_treeshold
 
 
 def is_grabbing(

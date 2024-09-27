@@ -70,7 +70,7 @@ def main():
         hand_landmarks = get_hand_landmarks(frame)
         if hand_landmarks is not None:
             # print_hand_landmarks(hand_landmarks)
-            print("\nWrist: " + str(hand_landmarks.wrist))
+            # print("\nWrist: " + str(hand_landmarks.wrist))
             sphere_position = display_to_3d.convert(hand_landmarks.wrist)
             # print("Sphere: " + str(sphere_position))
 
@@ -131,5 +131,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nExiting...")
     finally:
+        print("Releasing camera and closing windows...")
+        print("Thank you for using!")
         cap.release()
         cv2.destroyAllWindows()

@@ -4,8 +4,6 @@ from OpenGL.GLU import *
 from points import Point, Point2D, Point3D
 
 
-smallest_allowed_depth = -1e-7
-largest_allowed_depth = 1e7
 class DisplayTo3D:
     def __init__(self, display_size: tuple[int, int]):
         self.display_size = display_size
@@ -25,24 +23,24 @@ class DisplayTo3D:
 
     def normalize_hand_depth(
         hand_landmark_depth: float,
-        min_capture_found: float,
-        max_capture_found: float,
+        min_capture: float = -1_000_000,
+        max_capture: float = 1_000_000,
     ) -> float:
         """Normalize and invert the depth of the hand landmark."""
 
-        # Ensure the depth is within the min/max allowed range
-        hand_landmark_depth = max(smallest_allowed_depth, min(largest_allowed_depth, hand_landmark_depth))
+        # print("\t\tHand Landmark Depth:", hand_landmark_depth)
 
-        depth = max(min_capture_found, min(max_capture_found, hand_landmark_depth))
-        depth = depth - min_capture_found
+        # Clamp the depth between the min and max capture values
+        depth = max(min_capture, min(max_capture, hand_landmark_depth))
+        depth = depth - min_capture
 
-        range_found = max_capture_found - min_capture_found
-        normalized_depth = depth / range_found
+        range = max_capture - min_capture
+        normalized_depth = depth / range
 
         # Clamp the result between 0 and 1 (just in case)
         normalized_depth = max(0.0, min(1.0, normalized_depth))
 
-        return 1 - normalized_depth
+        return normalized_depth
 
 
     def convert(self,
