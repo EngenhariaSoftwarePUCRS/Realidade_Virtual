@@ -10,4 +10,4 @@ Disciplina do [Programa de Pós Graduação em Ciências da Computação](https:
 
 ## Links Úteis
 
-  - https://www.inf.pucrs.br/pinho/CG/
+  - https://www.inf.pucrs.br/pinho/RV-PPGCC/
